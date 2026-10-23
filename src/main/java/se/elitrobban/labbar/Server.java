@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  * port-scan-timeouts).
  *
  * <pre>
- *   GET  /                         terminalsidan
+ *   GET  /                         terminalsidan (+ /splash.js)
  *   GET  /api/info                 vilka commits som kor
  *   POST /api/start?program=X      startar bibliotek eller budget, svarar {id}
  *   GET  /api/k/{id}/ut?fran=N     utskrift efter bit N, vantar upp till 20 s (long-poll)
@@ -88,7 +88,9 @@ public final class Server {
             String metod = ex.getRequestMethod();
 
             if (vag.equals("/") || vag.equals("/index.html")) {
-                sidan(ex);
+                fil(ex, "index.html", "text/html; charset=utf-8");
+            } else if (vag.equals("/splash.js")) {
+                fil(ex, "splash.js", "text/javascript; charset=utf-8");
             } else if (vag.equals("/api/health")) {
                 json(ex, 200, "{\"ok\":true}");
             } else if (vag.equals("/api/info") && metod.equals("GET")) {
@@ -124,10 +126,10 @@ public final class Server {
         }
     }
 
-    private void sidan(HttpExchange ex) throws IOException {
-        try (InputStream in = Server.class.getResourceAsStream("/public/index.html")) {
+    private void fil(HttpExchange ex, String namn, String typ) throws IOException {
+        try (InputStream in = Server.class.getResourceAsStream("/public/" + namn)) {
             byte[] html = in.readAllBytes();
-            ex.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
+            ex.getResponseHeaders().set("Content-Type", typ);
             ex.getResponseHeaders().set("Cache-Control", "no-cache");
             ex.sendResponseHeaders(200, html.length);
             ex.getResponseBody().write(html);
@@ -138,10 +140,16 @@ public final class Server {
         List<String> delar = new ArrayList<>();
         for (String namn : List.of("bibliotek", "budget")) {
             Program p = program.get(namn);
+            Program.Exempel e = p.exempel();
             delar.add(str(namn) + ":{\"titel\":" + str(p.titel()) + ",\"repo\":" + str(p.repo())
-                    + ",\"commit\":" + str(p.commit()) + "}");
+                    + ",\"commit\":" + str(p.commit())
+                    + (e == null ? "" : ",\"rader\":" + e.rader() + ",\"saldo\":" + e.saldo()) + "}");
         }
-        json(ex, 200, "{" + String.join(",", delar) + ",\"java\":" + str(Runtime.version().toString()) + "}");
+        // Render satter RENDER_GIT_COMMIT till det har repots commit; lokalt finns ingen deploy att visa
+        String deploy = System.getenv().getOrDefault("RENDER_GIT_COMMIT", "");
+        if (deploy.length() > 7) deploy = deploy.substring(0, 7);
+        json(ex, 200, "{" + String.join(",", delar) + ",\"java\":" + str(Runtime.version().toString())
+                + (deploy.isEmpty() ? "" : ",\"deploy\":" + str(deploy)) + "}");
     }
 
     private void start(HttpExchange ex) throws IOException {

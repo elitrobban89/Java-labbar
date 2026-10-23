@@ -51,7 +51,39 @@ record Program(String namn, String titel, String mainClass, String repo, Path ro
         return String.join(java.io.File.pathSeparator, delar);
     }
 
-    /** Kopierar startfilerna (t.ex. budgetens transaktioner.csv ur repot) till arbetskatalogen. */
+    /** Det splashen visar om startfilen: antal transaktioner och saldot. */
+    record Exempel(int rader, double saldo) {
+    }
+
+    /**
+     * Läser startfilens transaktioner.csv, om programmet har en. Bara för splashens siffror -
+     * labben läser filen själv. Trasiga rader hoppas över precis som i TransaktionFilHanterare.
+     * null = ingen fil, och då visar splashen raden utan tal i stället för med påhittade.
+     */
+    Exempel exempel() {
+        Path csv = rot.resolve("start").resolve("transaktioner.csv");
+        if (!Files.isRegularFile(csv)) return null;
+        try {
+            int rader = 0;
+            double saldo = 0;
+            for (String rad : Files.readAllLines(csv)) {
+                String[] d = rad.split(";");
+                if (d.length != 4) continue;
+                try {
+                    double belopp = Double.parseDouble(d[2]);
+                    saldo += d[3].equals("INKOMST") ? belopp : -belopp;
+                    rader++;
+                } catch (NumberFormatException e) {
+                    // trasig rad
+                }
+            }
+            return new Exempel(rader, saldo);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /** Kopierar startfilerna (budgetens transaktioner.csv ur exempeldata/) till arbetskatalogen. */
     void forbered(Path arbetskatalog) throws IOException {
         Path start = rot.resolve("start");
         if (!Files.isDirectory(start)) return;

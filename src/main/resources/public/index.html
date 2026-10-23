@@ -110,6 +110,7 @@
   <p class="om" id="om"></p>
 </div>
 
+<script src="splash.js" defer></script>
 <script>
 (function () {
   'use strict';
@@ -196,13 +197,22 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (s) {
         if (minGen !== gen) return;
-        if (!s.ok) { lagg((s.j.fel || 'Kunde inte starta programmet') + '\n', 'err'); return; }
+        if (!s.ok) { lagg((s.j.fel || 'Kunde inte starta programmet') + '\n', 'err'); signaleraRedo(); return; }
         aktuellt = { id: s.j.id, program: program, nasta: 0, klar: false };
         hamta(aktuellt, minGen);
       })
       .catch(function () {
         if (minGen === gen) lagg('Kunde inte nå Java-tjänsten. Försök igen om en stund.\n', 'err');
+        signaleraRedo();
       });
+  }
+
+  // Splashen släpper på DATAN, inte på sin egen speltid: den väntar på att programmet skrivit
+  // sin första rad. Ett fel är också ett slut på väntan, så båda vägarna signalerar.
+  function signaleraRedo() {
+    if (window.LABBAR_REDO) return;
+    window.LABBAR_REDO = true;
+    window.dispatchEvent(new Event('labbar-redo'));
   }
 
   function hamta(k, minGen) {
@@ -210,8 +220,9 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (s) {
         if (minGen !== gen) return;
-        if (!s.ok) { lagg('\n' + (s.j.fel || 'Körningen avbröts') + '\n', 'err'); k.klar = true; return; }
+        if (!s.ok) { lagg('\n' + (s.j.fel || 'Körningen avbröts') + '\n', 'err'); k.klar = true; signaleraRedo(); return; }
         s.j.bitar.forEach(function (b) { lagg(b.t, b.e ? 'err' : ''); });
+        if (s.j.bitar.length) signaleraRedo();
         k.nasta = s.j.nasta;
         if (s.j.klar) {
           k.klar = true;
@@ -249,6 +260,8 @@
 
   fetch('api/info').then(function (r) { return r.json(); }).then(function (j) {
     info = j;
+    window.LABBAR_INFO = j;
+    window.dispatchEvent(new Event('labbar-info'));
     visaKalla(valt);
   }).catch(function () {});
 
