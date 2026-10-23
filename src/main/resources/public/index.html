@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<!-- Java-labbar — (c) 2026 Robert Andersson Kopler. Alla rattigheter forbehallna. -->
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Java-labbar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gron: #014932;
+    --gron2: #395144;
+    --persika: #FFEFEA;
+    --term: #0f1a15;
+    --termtext: #d6f5e3;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: #000; }
+  body { font-family: "Hind", system-ui, sans-serif; padding: 4px 16px 16px; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  .intro { font-size: 1.05rem; line-height: 1.55; margin: 0 0 14px; color: #333; }
+
+  .val { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 14px; }
+  .kort {
+    font: inherit; text-align: left; cursor: pointer; background: #fff; color: #000;
+    border: 2px solid var(--gron); border-radius: 12px; padding: 12px 16px;
+    display: flex; flex-direction: column; gap: 2px; transition: background .15s, color .15s;
+  }
+  .kort:hover { background: var(--persika); }
+  .kort:focus-visible { outline: 3px solid var(--gron2); outline-offset: 2px; }
+  .kort[aria-pressed="true"] { background: var(--gron); color: #fff; }
+  .kort b { font-size: 1.1rem; line-height: 1.3; }
+  .kort span { font-size: .9rem; opacity: .85; line-height: 1.35; }
+
+  .term { background: var(--term); border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px rgba(1,73,50,.18); }
+  .topp {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #1c2b24; color: #9fc4b0;
+    font: 12px/1.4 var(--mono);
+  }
+  .topp i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; flex: none; }
+  .topp i + i { background: #febc2e; }
+  .topp i + i + i { background: #28c840; }
+  .topp em { font-style: normal; margin-left: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ut {
+    height: min(470px, 62vh); overflow-y: auto; padding: 12px 14px; color: var(--termtext);
+    font: 14px/1.45 var(--mono); white-space: pre-wrap; word-break: break-word; cursor: text;
+  }
+  .ut .err { color: #ff9b8a; }
+  .ut .eko { color: #fff; }
+  .ut .info { color: #8fb8a3; font-style: italic; }
+  .markor { color: #fff; }
+  .markor::after {
+    content: ""; display: inline-block; width: .6em; height: 1.1em; margin-left: 1px; vertical-align: text-bottom;
+    background: #7bdcb5; animation: blink 1s steps(1) infinite;
+  }
+  .ut:not(.fokus) .markor::after { background: transparent; outline: 1px solid #7bdcb5; animation: none; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .markor::after { animation: none; } }
+  /* Det riktiga inmatningsfaltet: osynligt men fokuserbart, sa mobilens tangentbord kommer fram */
+  .input { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+  .rad { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 0; }
+  .knapp {
+    font: inherit; font-size: .9rem; cursor: pointer; padding: 5px 12px; border-radius: 999px;
+    border: 1px solid var(--gron); color: var(--gron); background: #fff;
+  }
+  .knapp:hover { background: var(--persika); }
+  .knapp:focus-visible { outline: 2px solid var(--gron2); outline-offset: 2px; }
+  .kalla { font-size: .9rem; color: #555; margin-left: auto; }
+  .kalla a, .om a { color: var(--gron); }
+  .om { font-size: .95rem; line-height: 1.5; margin: 10px 0 0; color: #333; }
+
+  @media (max-width: 560px) {
+    body { padding: 4px 12px 12px; }
+    .val { grid-template-columns: 1fr; gap: 8px; }
+    .ut { font-size: 12.5px; height: 58vh; }
+    .kalla { margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="intro">Två konsolprogram från Java-kursen. Koden hämtas från GitHub och körs som
+    riktiga Java-program på servern. Välj ett program, skriv ett menyval och tryck Enter,
+    precis som i terminalen.</p>
+
+  <div class="val" role="group" aria-label="Välj program">
+    <button type="button" class="kort" data-prog="bibliotek" aria-pressed="false">
+      <b>Bibliotekshanteraren</b><span>Labb 1 — böcker, medlemmar och lån</span>
+    </button>
+    <button type="button" class="kort" data-prog="budget" aria-pressed="false">
+      <b>Budgethanteraren</b><span>Labb 2 — inkomster, utgifter och saldo</span>
+    </button>
+  </div>
+
+  <div class="term">
+    <div class="topp" aria-hidden="true"><i></i><i></i><i></i><em id="titel"></em></div>
+    <div class="ut" id="ut" role="log" aria-live="polite"></div>
+    <input class="input" id="input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+           enterkeyhint="send" aria-label="Skriv i terminalen och tryck Enter">
+  </div>
+
+  <div class="rad">
+    <button type="button" class="knapp" id="omstart">Starta om</button>
+    <span class="kalla" id="kalla"></span>
+  </div>
+  <p class="om" id="om"></p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var OM = {
+    bibliotek: 'Egna arrayer som dubblas när de blir fulla, bubble sort på titel och max fem lån per medlem. ' +
+      'Programmet sparar ingenting, så biblioteket börjar tomt varje körning. Prova: 1 lägger till en bok, 2 en medlem, 3 lånar.',
+    budget: 'Generiskt Repository, streams, Optional och egna undantag. Varje körning får en egen kopia av ' +
+      'repots transaktioner.csv. Röda rader är loggen, som i konsolen bara visar WARNING och SEVERE.'
+  };
+  var KOMMANDO = { bibliotek: 'java org.example.CliApp', budget: 'java CliApp' };
+
+  var ut = document.getElementById('ut');
+  var input = document.getElementById('input');
+  var info = null;
+  var aktuellt = null;   // { id, program, nasta, gen }
+  var gen = 0;
+  var valt = 'bibliotek';
+  var skrivet = '';
+  var markor = document.createElement('span');
+  markor.className = 'markor';
+
+  // ── Utskrift ──
+  function lagg(text, klass) {
+    var s = document.createElement('span');
+    if (klass) s.className = klass;
+    s.textContent = text;
+    ut.insertBefore(s, markor);
+    ut.scrollTop = ut.scrollHeight;
+  }
+  function visaMarkor() {
+    markor.textContent = skrivet;
+    if (!markor.parentNode) ut.appendChild(markor);
+    ut.scrollTop = ut.scrollHeight;
+  }
+
+  // ── Inmatning ──
+  function fokus() {
+    if (window.getSelection && String(window.getSelection()) !== '') return; // låt markering vara
+    input.focus({ preventScroll: true });
+  }
+  ut.addEventListener('click', fokus);
+  input.addEventListener('focus', function () { ut.classList.add('fokus'); });
+  input.addEventListener('blur', function () { ut.classList.remove('fokus'); });
+  input.addEventListener('input', function () { skrivet = input.value; visaMarkor(); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    var rad = input.value;
+    input.value = '';
+    skrivet = '';
+    markor.textContent = '';
+    if (!aktuellt) return;
+    if (aktuellt.klar) { starta(aktuellt.program); return; }
+    lagg(rad + '\n', 'eko');
+    fetch('api/k/' + aktuellt.id + '/in', { method: 'POST', body: rad }).catch(function () {});
+  });
+
+  // ── Körningar ──
+  function stoppa() {
+    if (aktuellt && !aktuellt.klar) {
+      fetch('api/k/' + aktuellt.id + '/stopp', { method: 'POST', keepalive: true }).catch(function () {});
+    }
+  }
+
+  function starta(program) {
+    stoppa();
+    var minGen = ++gen;
+    valt = program;
+    aktuellt = null;
+    ut.textContent = '';
+    skrivet = ''; input.value = '';
+    visaMarkor();
+    document.querySelectorAll('.kort').forEach(function (k) {
+      k.setAttribute('aria-pressed', String(k.getAttribute('data-prog') === program));
+    });
+    document.getElementById('titel').textContent = (program === 'bibliotek' ? 'Bibliotekshanteraren' : 'Budgethanteraren') +
+      ' — ' + KOMMANDO[program];
+    document.getElementById('om').textContent = OM[program];
+    visaKalla(program);
+    lagg('$ ' + KOMMANDO[program] + '\n', 'info');
+
+    fetch('api/start?program=' + program, { method: 'POST' })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (s) {
+        if (minGen !== gen) return;
+        if (!s.ok) { lagg((s.j.fel || 'Kunde inte starta programmet') + '\n', 'err'); return; }
+        aktuellt = { id: s.j.id, program: program, nasta: 0, klar: false };
+        hamta(aktuellt, minGen);
+      })
+      .catch(function () {
+        if (minGen === gen) lagg('Kunde inte nå Java-tjänsten. Försök igen om en stund.\n', 'err');
+      });
+  }
+
+  function hamta(k, minGen) {
+    fetch('api/k/' + k.id + '/ut?fran=' + k.nasta)
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (s) {
+        if (minGen !== gen) return;
+        if (!s.ok) { lagg('\n' + (s.j.fel || 'Körningen avbröts') + '\n', 'err'); k.klar = true; return; }
+        s.j.bitar.forEach(function (b) { lagg(b.t, b.e ? 'err' : ''); });
+        k.nasta = s.j.nasta;
+        if (s.j.klar) {
+          k.klar = true;
+          lagg('\nProcess finished with exit code ' + s.j.kod + '\n', 'info');
+          lagg('Tryck Enter för att köra igen ', 'info');
+          return;
+        }
+        hamta(k, minGen);
+      })
+      .catch(function () {
+        if (minGen !== gen) return;
+        setTimeout(function () { if (minGen === gen) hamta(k, minGen); }, 2000);
+      });
+  }
+
+  function visaKalla(program) {
+    var el = document.getElementById('kalla');
+    el.textContent = '';
+    if (!info || !info[program]) return;
+    var p = info[program];
+    var a = document.createElement('a');
+    a.href = p.repo + '/tree/' + p.commit; a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = 'GitHub @ ' + p.commit;
+    el.append('Byggt från ', a, ' · Java ' + String(info.java).split(/[+-]/)[0]);
+  }
+
+  document.querySelectorAll('.kort').forEach(function (k) {
+    k.addEventListener('click', function () { starta(k.getAttribute('data-prog')); fokus(); });
+  });
+  document.getElementById('omstart').addEventListener('click', function () {
+    starta(valt);
+    fokus();
+  });
+  window.addEventListener('pagehide', stoppa);
+
+  fetch('api/info').then(function (r) { return r.json(); }).then(function (j) {
+    info = j;
+    visaKalla(valt);
+  }).catch(function () {});
+
+  starta('bibliotek');
+})();
+</script>
+</body>
+</html>
