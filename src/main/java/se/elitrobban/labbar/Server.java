@@ -162,6 +162,9 @@ public final class Server {
                 "-XX:ReservedCodeCacheSize=16m", "-XX:MaxMetaspaceSize=48m",
                 "-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8", "-Dstdin.encoding=UTF-8",
                 "-Dfile.encoding=UTF-8", "-Duser.language=sv", "-Duser.country=SE",
+                // Containern gar pa UTC: utan detta far loggen fel klockslag och LocalDate.now()
+                // fel dag mellan midnatt och 01/02 svensk tid
+                "-Duser.timezone=Europe/Stockholm",
                 "-cp", p.classpath(), p.mainClass());
         pb.directory(katalog.toFile());
         String id = UUID.randomUUID().toString();
