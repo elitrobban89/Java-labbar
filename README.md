@@ -45,18 +45,18 @@ gammal dator. Allt finns i `index.html`, och det gäller båda labbarna.
   ljusband som sakta sveper nedåt. Fel visas med ljus bakgrund, eftersom skärmen bara har en färg.
 - **Start:** när ett program startar slås skärmen på som ett gammalt rör, med en ljus linje som vecklas ut.
 - **Enter:** raden man skickar lyser upp, och en ljusvåg går genom ramen.
-- **Menyval:** rader som `3. Låna bok` eller `e. Avsluta` går att trycka på och skickar valet, så att man
-  på mobilen slipper fälla upp tangentbordet. På datorn flyttar pil upp och ned mellan valen och Enter
-  skickar det valda, som i Fallout (när man inte har börjat skriva något). Den valda raden lyser upp
-  med inverterade färger, och det klickar svagt när man flyttar. Valen
-  gäller bara tills man har svarat. Sedan blir de vanlig text igen, så att ett gammalt menyval inte kan
-  skickas till en senare fråga.
-- **Huvudmenyn överst:** menyn med `e. Avsluta` ligger fast överst i terminalen med större text. När man
-  väljer något töms ytan under den, och valet skrivs först, till exempel `> 3. Låna bok`, följt av
-  programmets frågor och svar. Undermenyer, som filtreringen i Budgethanteraren, stannar i texten.
-- **Höjden:** terminalen tar all höjd som blir över i den 820 px höga ramen. Sidan kan också fylla
-  hela skärmen om sidan runt ramen skickar fönstrets höjd (`jlFonster`) och sätter ramens höjd efter
-  svaret (`jlHojd`), men det används inte i WordPress-blocket idag.
+- **Huvudmenyn överst:** menyn med `e. Avsluta` ligger fast överst i terminalen (27 px på datorn, 21 px
+  på mobilen). När man väljer något töms ytan under den, och valet skrivs först, till exempel
+  `> 3. Låna bok`, följt av programmets frågor och svar (24 px, 19 px på mobilen). Undermenyer, som
+  filtreringen i Budgethanteraren, stannar i texten.
+- **Menyval:** rader som `3. Låna bok` går att trycka på och skickar valet, så att man på mobilen
+  slipper fälla upp tangentbordet. På datorn flyttar pil upp och ned mellan valen och Enter skickar det
+  valda, som i Fallout (när man inte har börjat skriva något). Den valda raden lyser upp med inverterade
+  färger, och det klickar svagt när man flyttar. Valen gäller bara tills man har svarat. Sedan blir de
+  vanlig text igen, så att ett gammalt menyval inte kan skickas till en senare fråga.
+- **Höjden:** WordPress-blockets ram är 820 px hög, och terminalen tar all höjd som blir över där.
+  Sidan kan också fylla hela skärmen om sidan runt ramen skickar fönstrets höjd (`jlFonster`) och
+  sätter ramens höjd efter svaret (`jlHojd`), men det används inte idag.
 - **Gnistor:** gröna gnistor när programmet skriver att något lyckades: en bok eller medlem har lagts
   till, en bok lånas ut eller lämnas tillbaka, en transaktion har skapats eller sparats. Raderna känns
   igen med regexen `LYCKAT`.
