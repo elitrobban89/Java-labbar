@@ -46,7 +46,9 @@ gammal dator. Allt finns i `index.html`, och det gäller båda labbarna.
 - **Start:** när ett program startar slås skärmen på som ett gammalt rör, med en ljus linje som vecklas ut.
 - **Enter:** raden man skickar lyser upp, och en ljusvåg går genom ramen.
 - **Menyval:** rader som `3. Låna bok` eller `e. Avsluta` går att trycka på och skickar valet, så att man
-  på mobilen slipper fälla upp tangentbordet. Raden lyser upp med inverterade färger, som i Fallout. Valen
+  på mobilen slipper fälla upp tangentbordet. På datorn flyttar pil upp och ned mellan valen och Enter
+  skickar det valda, som i Fallout (när man inte har börjat skriva något). Den valda raden lyser upp
+  med inverterade färger, och det klickar svagt när man flyttar. Valen
   gäller bara tills man har svarat. Sedan blir de vanlig text igen, så att ett gammalt menyval inte kan
   skickas till en senare fråga.
 - **Gnistor:** gröna gnistor när programmet skriver att något lyckades: en bok eller medlem har lagts

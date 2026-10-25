@@ -143,7 +143,7 @@
     padding: 0 4px; margin-left: -4px; text-align: left; cursor: pointer; border-radius: 2px;
     -webkit-tap-highlight-color: transparent;
   }
-  .menyval:not(:disabled):hover, .menyval:not(:disabled):focus-visible, .menyval:not(:disabled):active {
+  .menyval.vald:not(:disabled), .menyval:not(:disabled):active {
     background: var(--fos); color: #031a0d; text-shadow: none; outline: none;
   }
   .menyval:disabled { cursor: text; }
@@ -241,12 +241,37 @@
       b.type = 'button';
       b.className = 'menyval';
       b.textContent = m[2] + '.' + m[3];
+      b.tabIndex = -1;   // pilarna väljer, så Tab ska inte stanna på varje rad
       b.addEventListener('click', function () { if (!b.disabled) skicka(m[2]); });
+      b.addEventListener('mouseenter', function () { if (!b.disabled) valj(b); });
       s.appendChild(b);
     });
   }
   function slackMenyer() {
     ut.querySelectorAll('.menyval:not(:disabled)').forEach(function (b) { b.disabled = true; });
+    valj(null);
+  }
+
+  // Pil upp och ned flyttar mellan menyvalen som i Fallout, och Enter skickar det valda.
+  var vald = null;
+  function valj(b) {
+    if (vald) vald.classList.remove('vald');
+    vald = b;
+    if (!b) return;
+    b.classList.add('vald');
+    // Scrolla bara terminalen, inte WordPress-sidan runt ramen.
+    var r = b.getBoundingClientRect(), u = ut.getBoundingClientRect();
+    if (r.top < u.top) ut.scrollTop -= u.top - r.top + 8;
+    else if (r.bottom > u.bottom) ut.scrollTop += r.bottom - u.bottom + 8;
+  }
+  function flytta(steg) {
+    var val = [].slice.call(ut.querySelectorAll('.menyval:not(:disabled)'));
+    if (!val.length) return false;
+    var i = val.indexOf(vald);
+    i = i < 0 ? (steg > 0 ? 0 : val.length - 1) : (i + steg + val.length) % val.length;
+    valj(val[i]);
+    ton(520, 0, .03, .025);
+    return true;
   }
 
   // ── Effekter ──
@@ -396,10 +421,15 @@
   window.addEventListener('focus', function () { if (!document.activeElement || document.activeElement === document.body) fokus(); });
   // Terminalen skriver alltid sist på raden, så markören hålls i slutet av fältet.
   function markorSist() { var n = input.value.length; try { input.setSelectionRange(n, n); } catch (e) {} }
-  input.addEventListener('input', function () { markorSist(); skrivet = input.value; visaMarkor(); klick(); });
+  input.addEventListener('input', function () { markorSist(); skrivet = input.value; visaMarkor(); klick(); valj(null); });
   input.addEventListener('keydown', function (e) {
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && input.value === '') {
+      if (flytta(e.key === 'ArrowDown' ? 1 : -1)) e.preventDefault();
+      return;
+    }
     if (e.key !== 'Enter') return;
     e.preventDefault();
+    if (vald && input.value === '') { skicka(vald.textContent.split('.')[0]); return; }
     skicka(input.value);
   });
 
@@ -431,6 +461,7 @@
     aktuellt = null;
     ut.textContent = '';
     svans = '';
+    valj(null);
     tand();
     skrivet = ''; input.value = '';
     visaMarkor();
