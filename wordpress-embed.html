@@ -2,11 +2,24 @@
 <!-- Klistras in i ett "Anpassad HTML"-block pa elitrobban.se/bibliotekshanteraren-och-budgethanteraren/.
      Texten ligger UNDER ramen: tills tjansten vaknat (gratisplanen, upp till ~2 min) ar ramen
      genomskinlig och texten syns; nar sidan laddats tacker dess vita bakgrund over den.
-     Inline max-width behovs - temat klammer annars blocket till 672 px. -->
+     Inline max-width behovs - temat klammer annars blocket till 672 px.
+     Skriptet later terminalen fylla skarmen: det skickar fonstrets hojd till ramen (jlFonster),
+     och ramen svarar med hur hog den behover vara (jlHojd). Utan skriptet blir ramen 820 px. -->
 <div style="position:relative; width:100%; max-width:900px; margin:0 auto;">
   <p style="position:absolute; top:40px; left:0; right:0; text-align:center; margin:0; padding:0 16px; color:#395144; font-size:1rem;">
     Startar Java-tjänsten på Render… gratisplanen sover när ingen använt den, så första besöket kan ta upp till två minuter.
   </p>
-  <iframe src="https://java-labbar.onrender.com/" title="Bibliotekshanteraren och Budgethanteraren"
+  <iframe id="java-labbar" src="https://java-labbar.onrender.com/" title="Bibliotekshanteraren och Budgethanteraren"
           style="position:relative; display:block; width:100%; height:820px; border:none; background:transparent;"></iframe>
 </div>
+<script>
+(function () {
+  var ram = document.getElementById('java-labbar'), KALLA = 'https://java-labbar.onrender.com';
+  function skicka() { ram.contentWindow.postMessage({ jlFonster: window.innerHeight }, KALLA); }
+  ram.addEventListener('load', skicka);
+  window.addEventListener('resize', skicka);
+  window.addEventListener('message', function (e) {
+    if (e.origin === KALLA && e.data && typeof e.data.jlHojd === 'number') ram.style.height = e.data.jlHojd + 'px';
+  });
+})();
+</script>

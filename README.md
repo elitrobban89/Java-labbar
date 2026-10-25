@@ -51,6 +51,12 @@ gammal dator. Allt finns i `index.html`, och det gäller båda labbarna.
   med inverterade färger, och det klickar svagt när man flyttar. Valen
   gäller bara tills man har svarat. Sedan blir de vanlig text igen, så att ett gammalt menyval inte kan
   skickas till en senare fråga.
+- **Huvudmenyn överst:** menyn med `e. Avsluta` ligger fast överst i terminalen med större text. När man
+  väljer något töms ytan under den, och valet skrivs först, till exempel `> 3. Låna bok`, följt av
+  programmets frågor och svar. Undermenyer, som filtreringen i Budgethanteraren, stannar i texten.
+- **Hela skärmen:** terminalen är lika hög som besökarens fönster. Skriptet i `wordpress-embed.html`
+  skickar fönstrets höjd till ramen, och ramen svarar med hur hög den behöver vara. Utan skriptet tar
+  terminalen den höjd som blir över i den 820 px höga ramen.
 - **Gnistor:** gröna gnistor när programmet skriver att något lyckades: en bok eller medlem har lagts
   till, en bok lånas ut eller lämnas tillbaka, en transaktion har skapats eller sparats. Raderna känns
   igen med regexen `LYCKAT`.
