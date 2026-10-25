@@ -45,6 +45,10 @@ gammal dator. Allt finns i `index.html`, och det gäller båda labbarna.
   ljusband som sakta sveper nedåt. Fel visas med ljus bakgrund, eftersom skärmen bara har en färg.
 - **Start:** när ett program startar slås skärmen på som ett gammalt rör, med en ljus linje som vecklas ut.
 - **Enter:** raden man skickar lyser upp, och en ljusvåg går genom ramen.
+- **Menyval:** rader som `3. Låna bok` eller `e. Avsluta` går att trycka på och skickar valet, så att man
+  på mobilen slipper fälla upp tangentbordet. Raden lyser upp med inverterade färger, som i Fallout. Valen
+  gäller bara tills man har svarat. Sedan blir de vanlig text igen, så att ett gammalt menyval inte kan
+  skickas till en senare fråga.
 - **Gnistor:** gröna gnistor när programmet skriver att något lyckades: en bok eller medlem har lagts
   till, en bok lånas ut eller lämnas tillbaka, en transaktion har skapats eller sparats. Raderna känns
   igen med regexen `LYCKAT`.
