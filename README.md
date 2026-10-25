@@ -52,6 +52,10 @@ gammal dator. Allt finns i `index.html`, och det gäller båda labbarna.
   *Ljud* stänger av dem, och valet sparas i webbläsaren.
 - Med *minska rörelse* påslaget i systemet stängs animationerna och gnistorna av.
 
+Terminalen har alltid fokus, så man kan skriva direkt utan att klicka. Ett klick var som helst på sidan
+(utom på länkar och knappar) eller ett tangenttryck flyttar fokus dit. På mobilen fälls tangentbordet
+upp först när man trycker på sidan, inte av sig självt.
+
 Inmatningen går via ett osynligt textfält som ligger inne i terminalen. Det låg tidigare utanför skärmen
 och var 1 px brett, och då fastnade mobilens markör först i fältet, så att `12` blev `21`. Markören
 hålls nu alltid sist.
