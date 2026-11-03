@@ -1,12 +1,178 @@
 <!-- Java-labbar — (c) 2026 Robert Andersson Kopler. Alla rattigheter forbehallna. -->
 <!-- Klistras in i ett "Anpassad HTML"-block pa elitrobban.se/bibliotekshanteraren-och-budgethanteraren/.
-     Texten ligger UNDER ramen: tills tjansten vaknat (gratisplanen, upp till ~2 min) ar ramen
-     genomskinlig och texten syns; nar sidan laddats tacker dess vita bakgrund over den.
-     Inline max-width behovs - temat klammer annars blocket till 672 px. -->
-<div style="position:relative; width:100%; max-width:900px; margin:0 auto;">
-  <p style="position:absolute; top:40px; left:0; right:0; text-align:center; margin:0; padding:0 16px; color:#395144; font-size:1rem;">
-    Startar Java-tjänsten på Render… gratisplanen sover när ingen använt den, så första besöket kan ta upp till två minuter.
-  </p>
-  <iframe src="https://java-labbar.onrender.com/" title="Bibliotekshanteraren och Budgethanteraren"
-          style="position:relative; display:block; width:100%; height:820px; border:none; background:transparent;"></iframe>
+     Inline max-width pa .jl-wrap behovs - temat klammer annars blocket till 672 px.
+     Laddningsskarmen ligger UNDER ramen: tills tjansten vaknat (gratisplanen, upp till ~2 min) ar ramen
+     genomskinlig och bootskarmen syns; nar sidan laddats tacker dess vita bakgrund over den.
+     Alla klasser borjar pa jl- sa att de inte krockar med temat. -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+  .jl-wrap { --jl-gron: #014932; --jl-persika: #FFEFEA; --jl-fos: #3dff8f; --jl-fos-svag: #1fae5c;
+             --jl-glod: rgba(61,255,143,.55); --jl-vt: "VT323", ui-monospace, Consolas, monospace;
+             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+             line-height: 1.6; box-sizing: border-box; }
+  .jl-wrap *, .jl-wrap *::before, .jl-wrap *::after { box-sizing: border-box; }
+
+  /* ---- CRT-inledningen ---- */
+  .jl-crt { position: relative; overflow: hidden; border-radius: 18px; padding: 26px 28px 24px;
+            background: radial-gradient(ellipse at center, #06301a 0%, #031a0d 65%, #010904 100%);
+            color: var(--jl-fos); box-shadow: 0 10px 40px rgba(1,73,50,.28), inset 0 0 60px rgba(0,0,0,.6); }
+  .jl-crt::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+                    background: repeating-linear-gradient(to bottom, rgba(0,0,0,.28) 0 1px, transparent 1px 3px); }
+  .jl-crt::after { content: ""; position: absolute; left: 0; right: 0; height: 120px; top: -120px; pointer-events: none;
+                   background: linear-gradient(to bottom, rgba(61,255,143,0), rgba(61,255,143,.08), rgba(61,255,143,0));
+                   animation: jl-svep 7s linear infinite; }
+  .jl-rad { font: 22px/1.3 var(--jl-vt); text-shadow: 0 0 6px var(--jl-glod); white-space: nowrap;
+            overflow: hidden; width: 0; animation: jl-skriv 1.1s steps(38, end) forwards; }
+  .jl-rad:nth-child(1) { animation-delay: .2s; }
+  .jl-rad:nth-child(2) { animation-delay: 1.5s; }
+  .jl-rad:nth-child(3) { animation-delay: 2.8s; }
+  .jl-ok { color: #031a0d; background: var(--jl-fos); padding: 0 6px; margin-left: 8px; }
+  .jl-rubrik { font: 40px/1.05 var(--jl-vt); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px;
+               text-shadow: 0 0 10px var(--jl-glod), 0 0 26px rgba(61,255,143,.25);
+               opacity: 0; animation: jl-tand .5s ease-out 4.1s forwards; }
+  .jl-markor { display: inline-block; width: .5em; height: .9em; margin-left: 4px; vertical-align: -2px;
+               background: var(--jl-fos); box-shadow: 0 0 8px var(--jl-glod); animation: jl-blink 1s steps(1) infinite; }
+  .jl-lead { position: relative; color: #c9f5da; margin: 0; max-width: 760px; font-size: 1.02rem;
+             opacity: 0; animation: jl-tand .6s ease-out 4.4s forwards; }
+  .jl-lead strong { color: var(--jl-fos); font-weight: 600; }
+
+  /* ---- Programkorten ---- */
+  .jl-kort { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 22px 0; }
+  .jl-k { background: #fff; border: 1px solid rgba(1,73,50,.15); border-radius: 16px; padding: 20px 22px;
+          box-shadow: 0 2px 10px rgba(1,73,50,.06); transition: transform .2s, box-shadow .2s; }
+  .jl-k:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(1,73,50,.14); }
+  .jl-k-topp { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .jl-ikon { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-size: 24px;
+             background: var(--jl-persika); flex: none; }
+  .jl-labb { font: 17px/1 var(--jl-vt); color: var(--jl-fos-svag); text-transform: uppercase; letter-spacing: 1px; }
+  .jl-namn { font-size: 1.15rem; font-weight: 700; color: var(--jl-gron); line-height: 1.2; }
+  .jl-k ul { margin: 0 0 14px; padding: 0; list-style: none; }
+  .jl-k li { position: relative; padding-left: 20px; margin: 4px 0; font-size: .95rem; }
+  .jl-k li::before { content: ">"; position: absolute; left: 2px; font: 18px/1.35 var(--jl-vt); color: var(--jl-fos-svag); }
+  .jl-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+  .jl-chips span { font-size: .75rem; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+                   background: var(--jl-gron); color: #fff; }
+  .jl-k a { font-weight: 600; color: var(--jl-gron); text-decoration: none; border-bottom: 2px solid var(--jl-persika); }
+  .jl-k a:hover { border-bottom-color: var(--jl-gron); }
+
+  /* ---- Så körs det ---- */
+  .jl-steg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0 0 22px;
+             background: var(--jl-persika); border-radius: 16px; overflow: hidden; }
+  .jl-s { padding: 16px 18px; position: relative; }
+  .jl-s + .jl-s { border-left: 1px dashed rgba(1,73,50,.25); }
+  .jl-nr { font: 30px/1 var(--jl-vt); color: var(--jl-gron); }
+  .jl-s b { display: block; color: var(--jl-gron); margin: 2px 0; }
+  .jl-s p { margin: 0; font-size: .88rem; color: #3b4a43; }
+
+  /* ---- Ramen och bootskärmen ---- */
+  .jl-ram { position: relative; border-radius: 18px; overflow: hidden; background: #031a0d;
+            box-shadow: 0 0 0 1px rgba(1,73,50,.2), 0 12px 44px rgba(1,73,50,.25); }
+  .jl-ram iframe { position: relative; display: block; width: 100%; height: 820px; border: 0; background: transparent; }
+  .jl-boot { position: absolute; inset: 0; padding: 34px 28px; color: var(--jl-fos); font: 22px/1.35 var(--jl-vt);
+             text-shadow: 0 0 6px var(--jl-glod);
+             background: radial-gradient(ellipse at center, #06301a 0%, #031a0d 65%, #010904 100%); }
+  .jl-boot::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+                     background: repeating-linear-gradient(to bottom, rgba(0,0,0,.28) 0 1px, transparent 1px 3px); }
+  .jl-bar { width: min(420px, 100%); height: 16px; border: 2px solid var(--jl-fos-svag); margin: 14px 0; padding: 2px; }
+  .jl-bar i { display: block; height: 100%; width: 0; background: var(--jl-fos); box-shadow: 0 0 10px var(--jl-glod);
+              animation: jl-ladda 110s cubic-bezier(.1,.7,.3,1) forwards; }
+  .jl-boot small { display: block; font: .9rem/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                   color: #9fd8b6; text-shadow: none; max-width: 520px; }
+
+  .jl-lankar { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+  .jl-lankar a { font-size: .9rem; font-weight: 600; text-decoration: none; padding: 8px 16px; border-radius: 999px;
+                 border: 1.5px solid var(--jl-gron); color: var(--jl-gron); background: #fff; transition: background .15s, color .15s; }
+  .jl-lankar a:hover { background: var(--jl-gron); color: #fff; }
+  .jl-lankar a.jl-primar { background: var(--jl-gron); color: #fff; }
+  .jl-lankar a.jl-primar:hover { background: #02654a; }
+
+  @keyframes jl-skriv { to { width: 100%; } }
+  @keyframes jl-tand { from { opacity: 0; filter: brightness(2.2) blur(1px); } to { opacity: 1; filter: none; } }
+  @keyframes jl-blink { 50% { opacity: 0; } }
+  @keyframes jl-svep { to { top: 100%; } }
+  @keyframes jl-ladda { to { width: 96%; } }
+
+  @media (max-width: 700px) {
+    .jl-kort, .jl-steg { grid-template-columns: 1fr; }
+    .jl-s + .jl-s { border-left: 0; border-top: 1px dashed rgba(1,73,50,.25); }
+    .jl-crt { padding: 20px 18px; }
+    .jl-rad { font-size: 17px; }
+    .jl-rubrik { font-size: 30px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .jl-wrap *, .jl-wrap *::before, .jl-wrap *::after { animation: none !important; transition: none !important; }
+    .jl-rad { width: auto; }
+    .jl-rubrik, .jl-lead { opacity: 1; }
+    .jl-bar i { width: 60%; }
+  }
+</style>
+
+<div class="jl-wrap" style="width:100%; max-width:1100px; margin:0 auto; padding:0 8px;">
+
+  <div class="jl-crt">
+    <div>
+      <div class="jl-rad">&gt; git clone Laboration-1 Laboration-2<span class="jl-ok">OK</span></div>
+      <div class="jl-rad">&gt; java org.example.CliApp<span class="jl-ok">BIBLIOTEK</span></div>
+      <div class="jl-rad">&gt; java CliApp<span class="jl-ok">BUDGET</span></div>
+    </div>
+    <div class="jl-rubrik">Två program. En terminal.<span class="jl-markor"></span></div>
+    <p class="jl-lead">Två textbaserade Java-program från labbarna i Java-kursen, och båda körs på riktigt, direkt
+      här på sidan. Koden hämtas <strong>oförändrad från GitHub</strong>, och du får en
+      <strong>egen Java-process</strong> som bara du pratar med.</p>
+  </div>
+
+  <div class="jl-kort">
+    <div class="jl-k">
+      <div class="jl-k-topp">
+        <div class="jl-ikon">📚</div>
+        <div><div class="jl-labb">Labb 1</div><div class="jl-namn">Bibliotekshanteraren</div></div>
+      </div>
+      <ul>
+        <li>Lägg till böcker och medlemmar</li>
+        <li>Låna ut och lämna tillbaka, med återlämningsdatum tre veckor fram</li>
+        <li>Sök på del av titel eller författare</li>
+        <li>Se beståndet i bokstavsordning och vem som har flest lån</li>
+      </ul>
+      <div class="jl-chips"><span>Arrayer som växer</span><span>Egen bubble sort</span><span>VG</span></div>
+      <a href="https://github.com/elitrobban89/Laboration-1-Bibliotekshanteraren" target="_blank" rel="noopener">Källkoden på GitHub →</a>
+    </div>
+
+    <div class="jl-k">
+      <div class="jl-k-topp">
+        <div class="jl-ikon">💰</div>
+        <div><div class="jl-labb">Labb 2</div><div class="jl-namn">Budgethanteraren</div></div>
+      </div>
+      <ul>
+        <li>Registrera inkomster och utgifter i egna kategorier</li>
+        <li>Filtrera, sortera och se saldo och summa per kategori</li>
+        <li>Sparar och läser transaktionerna från en CSV-fil</li>
+        <li>Varnar för fel i loggen i stället för att krascha</li>
+      </ul>
+      <div class="jl-chips"><span>JUnit · 37 tester</span><span>Record &amp; enum</span><span>Generics</span><span>Streams</span></div>
+      <a href="https://github.com/elitrobban89/Laboration-2-Budgethanteraren" target="_blank" rel="noopener">Källkoden på GitHub →</a>
+    </div>
+  </div>
+
+  <div class="jl-steg">
+    <div class="jl-s"><div class="jl-nr">01</div><b>GitHub</b><p>Labbarnas kod ligger i sina egna repon och ändras inte för webben.</p></div>
+    <div class="jl-s"><div class="jl-nr">02</div><b>Render bygger</b><p>Docker klonar repona och kör Maven. Ett rött JUnit-test stoppar bygget.</p></div>
+    <div class="jl-s"><div class="jl-nr">03</div><b>Din egen JVM</b><p>Det du skriver går till programmets stdin, och svaret kommer tillbaka från stdout.</p></div>
+  </div>
+
+  <div class="jl-ram">
+    <div class="jl-boot" aria-hidden="true">
+      &gt; STARTAR JAVA-TJÄNSTEN…<span class="jl-markor"></span>
+      <div class="jl-bar"><i></i></div>
+      <small>Gratisplanen på Render sover när ingen har använt den, så första besöket kan ta upp till två minuter.
+        Terminalen dyker upp här när servern har vaknat.</small>
+    </div>
+    <iframe src="https://java-labbar.onrender.com/" title="Bibliotekshanteraren och Budgethanteraren"></iframe>
+  </div>
+
+  <div class="jl-lankar">
+    <a class="jl-primar" href="https://java-labbar.onrender.com/" target="_blank" rel="noopener">Öppna i helskärm ↗</a>
+    <a href="https://github.com/elitrobban89/Laboration-1-Bibliotekshanteraren" target="_blank" rel="noopener">Labb 1 på GitHub</a>
+    <a href="https://github.com/elitrobban89/Laboration-2-Budgethanteraren" target="_blank" rel="noopener">Labb 2 på GitHub</a>
+    <a href="https://github.com/elitrobban89/Java-labbar" target="_blank" rel="noopener">Webbtjänsten på GitHub</a>
+  </div>
 </div>
