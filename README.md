@@ -72,6 +72,23 @@ Inmatningen går via ett osynligt textfält som ligger inne i terminalen. Det l�
 och var 1 px brett, och då fastnade mobilens markör först i fältet, så att `12` blev `21`. Markören
 hålls nu alltid sist.
 
+## WordPress-sidan
+
+`wordpress-embed.html` klistras in i ett *Anpassad HTML*-block på sidan och har samma gröna CRT-stil som
+terminalen. Alla klasser börjar på `jl-`, så att de inte krockar med temat. Blocket har fyra delar:
+
+- **CRT-inledningen:** kommandorader som skrivs fram (`git clone`, `java org.example.CliApp` …) och
+  rubriken *Två program. En terminal.*
+- **Programkorten:** ett kort per labb med vad programmet gör, vad det visar i Java (Bibliotekshanteraren:
+  arrayer som växer och egen bubble sort, Budgethanteraren: 37 JUnit-tester, record, enum, generics och
+  streams) och en länk till källkoden.
+- **Så körs det:** tre steg, GitHub → Render bygger → din egen JVM.
+- **Ramen och bootskärmen:** under ramen ligger en laddningsskärm (*STARTAR JAVA-TJÄNSTEN…*). Ramen är
+  genomskinlig tills tjänsten har vaknat (upp till två minuter på gratisplanen), och sedan täcker sidans
+  vita bakgrund laddningsskärmen. Under ramen finns länkar till helskärm och till de tre repona.
+
+Temat begränsar blocket till 672 px, så `.jl-wrap` behöver sin `max-width` inline.
+
 ## Teknik
 
 Java 27 (Eclipse Temurin), Maven-wrapper, inga beroenden. Ingen Spring: tjänsten startar på under en
